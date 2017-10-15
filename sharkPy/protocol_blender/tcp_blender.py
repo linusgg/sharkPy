@@ -10,6 +10,10 @@ def get_pseudoheader(pkt):
     res="00"
     protocol="06"
     
+    tcp=sharkPy.get_node_by_name(pkt, 'tcp')[0].attributes.data
+    tcp_offset=int(sharkPy.get_node_by_name(pkt, 'tcp')[0].attributes.offset)
+    tcp_seg=ph+sharkPy.get_node_by_name(pkt, 'frame')[0].attributes.data[tcp_offset*2:]
+    
     pseudo_len=12
     hdr_len=int(sharkPy.get_node_by_name(pkt, 'tcp.hdr_len')[0].attributes.fvalue)
     tcp_len=int(sharkPy.get_node_by_name(pkt, 'tcp.len')[0].attributes.fvalue)
@@ -93,8 +97,6 @@ def tcp_find_replace(pkt,
     if(new_dstport is not None):
         new_str_data= sharkPy.find_replace_data(pkt, dst_match_value, r'tcp.dstport', new_dstport, condition_funct=cf, up_propagate=True)
         
-    if(update_checksum):
-        tcp_checksum_fixup(pkt)
         
 def tcp_checksum_fixup(pkt):
     
